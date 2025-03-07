@@ -7,11 +7,14 @@ const XiangqiBoard = () => {
   const {
     pieces,
     draggingPiece,
+    selectedPiece,
     turn,
     svgRef,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handlePieceClick,
+    handleBoardClick,
     getPossibleMoves,
   } = useXiangqiGame();
 
@@ -26,7 +29,12 @@ const XiangqiBoard = () => {
     'b_pawn1': '卒', 'b_pawn2': '卒', 'b_pawn3': '卒', 'b_pawn4': '卒', 'b_pawn5': '卒',
   };
 
-  const possibleMoves = draggingPiece ? getPossibleMoves(draggingPiece, pieces[draggingPiece].x, pieces[draggingPiece].y) : [];
+  // Get possible moves for the selected piece
+  const possibleMoves = selectedPiece
+    ? getPossibleMoves(selectedPiece, pieces[selectedPiece].x, pieces[selectedPiece].y)
+    : (draggingPiece
+      ? getPossibleMoves(draggingPiece, pieces[draggingPiece].x, pieces[draggingPiece].y)
+      : []);
 
   return (
     <div>
@@ -40,14 +48,19 @@ const XiangqiBoard = () => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Board possibleMoves={possibleMoves} />
+        <Board
+          possibleMoves={possibleMoves}
+          onBoardClick={handleBoardClick}
+        />
         {Object.entries(pieces).map(([piece, pos]) => pos && (
           <Piece
             key={piece}
             piece={piece}
             pos={pos}
             isDragging={draggingPiece === piece}
+            isSelected={selectedPiece === piece}
             onMouseDown={handleMouseDown}
+            onClick={() => handlePieceClick(piece)}
             symbol={pieceSymbols[piece]}
           />
         ))}

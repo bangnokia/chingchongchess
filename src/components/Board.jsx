@@ -1,8 +1,15 @@
 import React from 'react';
 
-const Board = ({ cellSize = 50, offsetX = 25, offsetY = 25, possibleMoves }) => {
+const Board = ({ cellSize = 50, offsetX = 25, offsetY = 25, possibleMoves, onBoardClick }) => {
   const boardWidth = 450;
   const boardHeight = 500;
+
+  // Handle click on board cell
+  const handleCellClick = (x, y) => {
+    if (onBoardClick) {
+      onBoardClick(x, y);
+    }
+  };
 
   return (
     <>
@@ -27,6 +34,19 @@ const Board = ({ cellSize = 50, offsetX = 25, offsetY = 25, possibleMoves }) => 
       {[{ x: 1, y: 2 }, { x: 7, y: 2 }, { x: 1, y: 7 }, { x: 7, y: 7 }].map((pos, i) => (
         <circle key={`mark${i}`} cx={offsetX + pos.x * cellSize} cy={offsetY + pos.y * cellSize} r="5" fill="gray" opacity="0.5" />
       ))}
+      {Array.from({ length: 9 }, (_, x) =>
+        Array.from({ length: 10 }, (_, y) => (
+          <rect
+            key={`cell-${x}-${y}`}
+            x={offsetX + x * cellSize}
+            y={offsetY + y * cellSize}
+            width={cellSize}
+            height={cellSize}
+            fill="transparent"
+            onClick={() => handleCellClick(x, y)}
+          />
+        ))
+      )}
       {possibleMoves.map((move, i) => (
         <circle
           key={`move${i}`}

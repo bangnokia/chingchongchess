@@ -23,6 +23,7 @@ export const useXiangqiGame = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [turn, setTurn] = useState('red');
   const [originalPosition, setOriginalPosition] = useState(null); // Store the original position
+  const [selectedPiece, setSelectedPiece] = useState(null);
   const svgRef = useRef(null);
 
   const isValidMove = (piece, fromX, fromY, toX, toY) => {
@@ -169,14 +170,60 @@ export const useXiangqiGame = () => {
     setOriginalPosition(null);
   };
 
+  // Handle piece selection for click-to-move functionality
+  const handlePieceClick = (piece) => {
+    // Only allow selecting pieces of current turn
+    if (piece[0] !== turn[0]) return;
+
+    // If the same piece is clicked again, deselect it
+    if (selectedPiece === piece) {
+      setSelectedPiece(null);
+      return;
+    }
+
+    // If a piece of the same color is already selected, switch selection
+    setSelectedPiece(piece);
+  };
+
+  // Handle board click for moving selected piece
+  const handleBoardClick = (x, y) => {
+    if (!selectedPiece) return;
+
+    const fromPos = pieces[selectedPiece];
+
+    // Check if the move is valid
+    if (isValidMove(selectedPiece, fromPos.x, fromPos.y, x, y)) {
+      const targetPiece = Object.keys(pieces).find(p =>
+        pieces[p] && pieces[p].x === x && pieces[p].y === y && p !== selectedPiece
+      );
+
+      // If there's an opponent's piece, capture it
+      setPieces(prev => ({
+        ...prev,
+        [selectedPiece]: { x, y },
+        ...(targetPiece && { [targetPiece]: undefined })
+      }));
+
+      // Switch turns
+      setTurn(turn === 'red' ? 'black' : 'red');
+
+      // Deselect the piece after move
+      setSelectedPiece(null);
+    }
+  };
+
   return {
     pieces,
     draggingPiece,
+    selectedPiece,
     turn,
     svgRef,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handlePieceClick,
+    handleBoardClick,
     getPossibleMoves,
+    setSelectedPiece,
   };
 };
