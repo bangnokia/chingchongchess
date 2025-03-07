@@ -1,0 +1,19 @@
+.chinese-chess {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.chess-board {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.chess-piece {
+  cursor: pointer;
+}
+
+.river-text {
+  font-size: 18px;
+  font-weight: bold;
+}
