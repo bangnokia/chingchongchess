@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Piece from './Piece';
 
 const XiangqiBoard = () => {
   const boardWidth = 450;
@@ -39,6 +40,7 @@ const XiangqiBoard = () => {
   const [draggingPiece, setDraggingPiece] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [turn, setTurn] = useState('red');
+  const [draggingStartPos, setDraggingStartPos] = useState(null);
 
   const isValidMove = (piece, fromX, fromY, toX, toY) => {
     const dx = toX - fromX;
@@ -128,6 +130,7 @@ const XiangqiBoard = () => {
       x: x - (offsetX + pieces[piece].x * cellSize),
       y: y - (offsetY + pieces[piece].y * cellSize)
     });
+    setDraggingStartPos(pieces[piece]);
   };
 
   const handleMouseMove = (e) => {
@@ -161,10 +164,10 @@ const XiangqiBoard = () => {
         }));
         setTurn(turn === 'red' ? 'black' : 'red');
       } else {
-        setPieces(prev => ({ ...prev, [draggingPiece]: { x: fromPos.x, y: fromPos.y } }));
+        setPieces(prev => ({ ...prev, [draggingPiece]: { x: draggingStartPos.x, y: draggingStartPos.y } }));
       }
     } else {
-      setPieces(prev => ({ ...prev, [draggingPiece]: { x: fromPos.x, y: fromPos.y } }));
+      setPieces(prev => ({ ...prev, [draggingPiece]: { x: draggingStartPos.x, y: draggingStartPos.y } }));
     }
     setDraggingPiece(null);
   };
@@ -211,31 +214,18 @@ const XiangqiBoard = () => {
         />
       ))}
       {Object.entries(pieces).map(([piece, pos]) => pos && (
-        <g
+        <Piece
           key={piece}
+          piece={piece}
+          pos={pos}
           onMouseDown={(e) => handleMouseDown(e, piece)}
-          style={{ cursor: piece[0] === turn[0] ? 'pointer' : 'default' }}
-        >
-          <circle
-            cx={offsetX + pos.x * cellSize}
-            cy={offsetY + pos.y * cellSize}
-            r="20"
-            fill={piece.startsWith('r') ? 'red' : 'black'}
-            opacity={draggingPiece === piece ? "1" : "0.8"}
-            stroke={draggingPiece === piece ? "yellow" : "none"}
-            strokeWidth="2"
-          />
-          <text
-            x={offsetX + pos.x * cellSize}
-            y={offsetY + pos.y * cellSize}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="white"
-            fontSize="20"
-          >
-            {pieceSymbols[piece]}
-          </text>
-        </g>
+          isDragging={draggingPiece === piece}
+          isTurn={piece[0] === turn[0]}
+          pieceSymbols={pieceSymbols}
+          offsetX={offsetX}
+          offsetY={offsetY}
+          cellSize={cellSize}
+        />
       ))}
     </svg>
   );
