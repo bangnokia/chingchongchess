@@ -22,6 +22,7 @@ export const useXiangqiGame = () => {
   const [draggingPiece, setDraggingPiece] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [turn, setTurn] = useState('red');
+  const [originalPosition, setOriginalPosition] = useState(null); // Store the original position
   const svgRef = useRef(null);
 
   const isValidMove = (piece, fromX, fromY, toX, toY) => {
@@ -29,13 +30,22 @@ export const useXiangqiGame = () => {
     const dy = toY - fromY;
     const isRed = piece.startsWith('r');
 
+    // Don't allow moving to the same position
+    if (dx === 0 && dy === 0) return false;
+
+    // Check board boundaries
     if (toX < 0 || toX > 8 || toY < 0 || toY > 9) return false;
+
+    // Check if target position has a piece of the same color
+    const targetPiece = Object.keys(pieces).find(p =>
+      pieces[p] && pieces[p].x === toX && pieces[p].y === toY && p !== piece
+    );
+    if (targetPiece && targetPiece[0] === piece[0]) return false;
 
     if (piece.includes('king')) {
       return (Math.abs(dx) === 1 && dy === 0) || (Math.abs(dy) === 1 && dx === 0) &&
-        toX >= 3 && toX <= 5 && (isRed ? toY >= 7 : toY <= 2);
+        toX >= 3 && toX <= 5 && (isRed ? toY >= 7 && toY <= 9 : toY >= 0 && toY <= 2);
     }
-    // ... (rest of the isValidMove logic remains the same)
     if (piece.includes('advisor')) {
       return Math.abs(dx) === 1 && Math.abs(dy) === 1 &&
         toX >= 3 && toX <= 5 && (isRed ? toY >= 7 : toY <= 2);
@@ -109,6 +119,8 @@ export const useXiangqiGame = () => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setDraggingPiece(piece);
+    // Store the original position when starting to drag
+    setOriginalPosition({ x: pieces[piece].x, y: pieces[piece].y });
     setDragOffset({
       x: x - (25 + pieces[piece].x * 50),
       y: y - (25 + pieces[piece].y * 50)
@@ -132,26 +144,29 @@ export const useXiangqiGame = () => {
     const rect = svgRef.current.getBoundingClientRect();
     const toX = Math.round((e.clientX - rect.left - 25) / 50);
     const toY = Math.round((e.clientY - rect.top - 25) / 50);
-    const fromPos = pieces[draggingPiece];
 
-    if (isValidMove(draggingPiece, fromPos.x, fromPos.y, toX, toY)) {
+    // Use the stored original position instead of rounding the current position
+    const fromX = originalPosition.x;
+    const fromY = originalPosition.y;
+
+    // Always snap piece to grid
+    if (isValidMove(draggingPiece, fromX, fromY, toX, toY)) {
       const targetPiece = Object.keys(pieces).find(p =>
-        pieces[p].x === toX && pieces[p].y === toY && p !== draggingPiece
+        pieces[p] && pieces[p].x === toX && pieces[p].y === toY && p !== draggingPiece
       );
-      if (!targetPiece || targetPiece[0] !== draggingPiece[0]) {
-        setPieces(prev => ({
-          ...prev,
-          [draggingPiece]: { x: toX, y: toY },
-          ...(targetPiece && { [targetPiece]: undefined })
-        }));
-        setTurn(turn === 'red' ? 'black' : 'red');
-      } else {
-        setPieces(prev => ({ ...prev, [draggingPiece]: { x: fromPos.x, y: fromPos.y } }));
-      }
+
+      setPieces(prev => ({
+        ...prev,
+        [draggingPiece]: { x: toX, y: toY },
+        ...(targetPiece && { [targetPiece]: undefined })
+      }));
+      setTurn(turn === 'red' ? 'black' : 'red');
     } else {
-      setPieces(prev => ({ ...prev, [draggingPiece]: { x: fromPos.x, y: fromPos.y } }));
+      // Invalid move - return to original position
+      setPieces(prev => ({ ...prev, [draggingPiece]: { x: fromX, y: fromY } }));
     }
     setDraggingPiece(null);
+    setOriginalPosition(null);
   };
 
   return {

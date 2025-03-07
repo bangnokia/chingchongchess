@@ -29,25 +29,30 @@ const XiangqiBoard = () => {
   const possibleMoves = draggingPiece ? getPossibleMoves(draggingPiece, pieces[draggingPiece].x, pieces[draggingPiece].y) : [];
 
   return (
-    <svg
-      ref={svgRef}
-      width={450}
-      height={500}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    >
-      <Board possibleMoves={possibleMoves} />
-      {Object.entries(pieces).map(([piece, pos]) => pos && (
-        <Piece
-          key={piece}
-          piece={piece}
-          pos={pos}
-          isDragging={draggingPiece === piece}
-          onMouseDown={handleMouseDown}
-          symbol={pieceSymbols[piece]}
-        />
-      ))}
-    </svg>
+    <div>
+      <div style={{ textAlign: 'center', marginBottom: '10px', fontSize: '18px' }}>
+        Current Turn: {turn === 'red' ? 'Red' : 'Black'}
+      </div>
+      <svg
+        ref={svgRef}
+        width={450}
+        height={500}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        <Board possibleMoves={possibleMoves} />
+        {Object.entries(pieces).map(([piece, pos]) => pos && (
+          <Piece
+            key={piece}
+            piece={piece}
+            pos={pos}
+            isDragging={draggingPiece === piece}
+            onMouseDown={handleMouseDown}
+            symbol={pieceSymbols[piece]}
+          />
+        ))}
+      </svg>
+    </div>
   );
 };
 
