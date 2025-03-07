@@ -1,13 +1,17 @@
 import React from 'react';
 
-function Piece({ piece, pos, onMouseDown, isDragging, isTurn, pieceSymbols, offsetX, offsetY, cellSize }) {
+const Piece = ({ piece, pos, isDragging, onMouseDown, symbol, cellSize = 50, offsetX = 25, offsetY = 25 }) => {
+  const isRed = piece.startsWith('r');
   return (
-    <g onMouseDown={onMouseDown} style={{ cursor: isTurn ? 'pointer' : 'default' }}>
+    <g
+      onMouseDown={(e) => onMouseDown(e, piece)}
+      style={{ cursor: piece[0] === 'r' || piece[0] === 'b' ? 'pointer' : 'default' }}
+    >
       <circle
         cx={offsetX + pos.x * cellSize}
         cy={offsetY + pos.y * cellSize}
         r="20"
-        fill={piece.startsWith('r') ? 'red' : 'black'}
+        fill={isRed ? 'red' : 'black'}
         opacity={isDragging ? "1" : "0.8"}
         stroke={isDragging ? "yellow" : "none"}
         strokeWidth="2"
@@ -20,10 +24,10 @@ function Piece({ piece, pos, onMouseDown, isDragging, isTurn, pieceSymbols, offs
         fill="white"
         fontSize="20"
       >
-        {pieceSymbols[piece]}
+        {symbol}
       </text>
     </g>
   );
-}
+};
 
 export default Piece;
