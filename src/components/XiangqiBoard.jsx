@@ -1,5 +1,5 @@
 import React from 'react';
-import { useXiangqiGame } from './useXiangqiGame';
+import { useXiangqiGame } from '../useXiangqiGame';
 import Board from './Board';
 import Piece from './Piece';
 

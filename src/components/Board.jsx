@@ -33,8 +33,9 @@ const Board = ({ cellSize = 50, offsetX = 25, offsetY = 25, possibleMoves }) => 
           cx={offsetX + move.x * cellSize}
           cy={offsetY + move.y * cellSize}
           r="10"
-          fill="green"
-          opacity="0.3"
+          fill="rgba(0, 255, 0, 0.4)"
+          stroke="white"
+          strokeWidth="1"
         />
       ))}
     </>

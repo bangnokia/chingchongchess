@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Piece = ({ piece, pos, isDragging, onMouseDown, symbol, cellSize = 50, offsetX = 25, offsetY = 25 }) => {
   const isRed = piece.startsWith('r');
+  const [isHovering, setIsHovering] = useState(false);
+
   return (
     <g
       onMouseDown={(e) => onMouseDown(e, piece)}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       style={{ cursor: piece[0] === 'r' || piece[0] === 'b' ? 'pointer' : 'default' }}
     >
+      {/* Outer ring visible only on hover */}
+      {isHovering && (
+        <circle
+          cx={offsetX + pos.x * cellSize}
+          cy={offsetY + pos.y * cellSize}
+          r="23"
+          fill="none"
+          stroke="white"
+          strokeWidth="2"
+        />
+      )}
       <circle
         cx={offsetX + pos.x * cellSize}
         cy={offsetY + pos.y * cellSize}

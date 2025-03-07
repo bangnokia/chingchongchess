@@ -1,4 +1,4 @@
-import XiangqiBoard from "./XiangqiBoard";
+import XiangqiBoard from "./components/XiangqiBoard";
 
 const App = () => {
   return (
